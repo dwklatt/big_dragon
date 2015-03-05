@@ -1,0 +1,67 @@
+%{
+  #include <stdio.h>
+  #include <stdlib.h>
+  #include "parser.tab.h"
+
+  //convient macro from ethan
+  #define PRINTA(x)   fprintf(stderr, "{%s}", #x); return x
+  #define PRINTB(x)  fprintf(stderr, "{%s[%s]}", #x, yytext); return x
+
+%}
+
+whitespace  [ \t]+
+letter      [a-zA-Z]
+digit       [0-9]
+id          {letter}({letter}|{digit})* 
+digits      {digit}+
+fraction    \.{digits} 
+exponent    E(\+|\-)?{digits}
+num         {digits}{fraction}?{exponent}?
+
+%%
+
+"="   { PRINTB(RELOP); }
+"<"   { PRINTB(RELOP); }
+"<>"  { PRINTB(RELOP); }
+"<="  { PRINTB(RELOP); }
+">="  { PRINTB(RELOP); }
+">"   { PRINTB(RELOP); }
+
+"+"   { PRINTB(ADDOP); }
+"-"   { PRINTB(ADDOP); }
+"or"  { PRINTB(ADDOP); }
+
+"*"   { PRINTB(MULOP); }
+"/"   { PRINTB(MULOP); }
+"div" { PRINTB(MULOP); }
+"mod" { PRINTB(MULOP); }
+"and" { PRINTB(MULOP); }
+
+":="  { PRINTB(ASSIGNOP); }
+
+"program"   { PRINTA(PROGRAM); }
+"var"       { PRINTA(VAR); }
+"array"     { PRINTA(ARRAY); }
+".."        { PRINTA(DOTDOT); }
+"of"        { PRINTA(OF); }
+"integer"   { PRINTA(INT); }
+"real"      { PRINTA(REAL); }
+"function"  { PRINTA(FUNC); }
+"procedure" { PRINTA(PROC); }
+"begin"     { PRINTA(BEGGIN); }
+"end"       { PRINTA(END); }
+"if"        { PRINTA(IF); }
+"then"      { PRINTA(THEN); }
+"else"      { PRINTA(ELSE); }
+"while"     { PRINTA(WHILE); }
+"do"        { PRINTA(DO); }
+"not"       { PRINTA(NOT); }
+
+{num}       { PRINTA(NUM); }
+{id}        { PRINTA(ID); }
+
+{whitespace} { ; }
+\n  { fprintf(stderr, "%s", yytext); }
+.   { fprintf(stderr, "<%c>", yytext[0]); return yytext[0]; }
+
+%%
