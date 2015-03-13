@@ -10,25 +10,16 @@
   
   extern scope_t *top_scope;
 	extern node_t *tmp;
-
-
-  int _verbose = 0;
-
-  void yyerror(char *msg)
-  {
-      fprintf(stderr, "Error: %s\n", msg);
-        exit(1);
-  }
-  int yywrap(void)
-  {
-      return 1;
-  }
-  int main(int argc, char ** argv)
-  {
-      _verbose = (argc == 2) && !(strcmp(argv[1],"-v"));
-        yyparse();
-  }
+  
 %}
+
+%union {
+	int ival;
+	float rval;
+	char *sval;
+	int opval;
+	tree_t *tval;
+}
 
 %token PROGRAM
 %token <sval> ID
@@ -175,7 +166,6 @@ expression:
 
 simple_expression:
   term { $$ = $1; }
-  | sign term
   | simple_expression ADDOP term
   { $$ = make_op(ADDOP, $2, $1, $3); }
   ;
@@ -225,3 +215,17 @@ sign:
 */
 
 %%
+
+scope_t *top_scope;
+node_t *tmp;
+main()
+{
+	top_scope = NULL;
+	tmp = NULL;
+	yyparse();
+}
+yyerror(char *message)
+{
+	fprintf(stderr, "Error: %s\n", message);
+	exit(1);
+}
