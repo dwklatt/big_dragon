@@ -2,7 +2,15 @@
   #include <stdio.h>
   #include <stdlib.h>
   #include <string.h>
+  #include <assert.h>
+	#include "node.h"
+	#include "scope.h"
+	#include "tree.h"
   #include "parser.tab.h"
+  
+  extern scope_t *top_scope;
+	extern node_t *tmp;
+
 
   int _verbose = 0;
 
@@ -23,7 +31,7 @@
 %}
 
 %token PROGRAM
-%token ID
+%token <sval> ID
 %token VAR
 %token ARRAY
 %token NUM
@@ -40,21 +48,40 @@
 %token ELSE
 %token WHILE
 %token DO
-%token RELOP
-%token ADDOP
-%token MULOP
+%token <opval> RELOP
+%token <opval> ADDOP
+%token <opval> MULOP
 %token ASSIGNOP
 %token NOT
+
+%token <ival> INUM
+%token <rval> RNUM
+
+%token LT LE GT GE EQ NE
+%token OR PLUS MINUS
+%token AND STAR SLASH
+
+%token FUNCTION_CALL
+%token ARRAY_ACCESS
+%token COMMA
+
+%type <tval> expression_list
+%type <tval> expression
+%type <tval> simple_expression
+%type <tval> term
+%type <tval> factor
 
 %%
 
 program:
+	{ top_scope = scope_push(top_scope); }
   PROGRAM ID '(' identifier_list ')' ';' declarations subprogram_declarations compound_statement '.'
+  { top_scope = scope_pop(top_scope); }
   ;
 
 identifier_list:
-  ID
-  | identifier_list ',' ID
+  ID { scope_insert(top_scope, $1); }
+  | identifier_list ',' ID { scope_insert(top_scope, $3); }
   ;
 
 declarations:
@@ -79,11 +106,14 @@ subprogram_declarations:
 
 subprogram_declaration:
   subprogram_head declarations compound_statement
+  { top_scope = scope_pop(top_scope); }
   ;
 
 subprogram_head:
-  FUNC ID arguments ':' standard_type ';'
-  | PROC ID arguments ';'
+  FUNC ID { top_scope = scope_push(top_scope); }
+  arguments ':' standard_type ';'
+  | PROC ID { top_scope = scope_push(top_scope); }
+  arguments ';'
   ;
 
 arguments:
@@ -112,6 +142,10 @@ statement_list:
 
 statement:
   variable ASSIGNOP expression
+  { fprintf(stderr, "\n\nPRINTING TREE:\n");
+		print_tree($3,0);
+		fprintf(stderr, "\n\n");
+	}
   | procedure_statement
   | compound_statement
   | IF expression THEN statement ELSE statement
@@ -134,32 +168,60 @@ expression_list:
   ;
 
 expression:
-  simple_expression
+  simple_expression { $$ = $1; }
   | simple_expression RELOP simple_expression
+  { $$ = make_op(RELOP, $2, $1, $3); }
   ;
 
 simple_expression:
-  term
+  term { $$ = $1; }
   | sign term
   | simple_expression ADDOP term
+  { $$ = make_op(ADDOP, $2, $1, $3); }
   ;
 
 term:
-  factor
+  factor { $$ = $1; }
   | term MULOP factor
+  { $$ = make_op(MULOP, $2, $1, $3); }
   ;
 
 factor:
   ID
+  {
+		if ((tmp = scope_search_all(top_scope, $1)) == NULL) {
+			fprintf(stderr, "Name %s used but not defined\n", $1);
+			exit(1);
+		}
+		$$ = make_id(tmp);
+	}
+  | ID '[' expression ']'
+  {
+		if ((tmp = scope_search_all(top_scope, $1)) == NULL) {
+			fprintf(stderr, "Name %s used but not defined\n", $1);
+			exit(1);
+		}
+		$$ = make_tree(ARRAY_ACCESS, make_id(tmp), $3);
+	}
   | ID '(' expression_list ')'
-  | NUM
-  | '(' expression ')'
-  | NOT factor
+	{
+		if ((tmp = scope_search_all(top_scope, $1)) == NULL) {
+			fprintf(stderr, "Name %s used but not defined\n", $1);
+			exit(1);
+		}
+		$$ = make_tree(FUNCTION_CALL, make_id(tmp), $3);
+	}
+	| INUM { $$ = make_inum($1); }
+	| RNUM { $$ = make_rnum($1); }
+  | '(' expression ')' { $$ = $2; }
+  | NOT factor { $$ = make_tree(NOT,NULL,NULL); }
   ;
 
+/*
 sign:
   '+'
   | '-'
   ;
+*/
 
 %%

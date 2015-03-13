@@ -1,6 +1,10 @@
 %{
   #include <stdio.h>
   #include <stdlib.h>
+  #include <assert.h>
+	#include "node.h"
+	#include "scope.h"
+	#include "tree.h"
   #include "parser.tab.h"
 
   //convient macro from ethan
@@ -12,11 +16,7 @@
 whitespace  [ \t]+
 letter      [a-zA-Z]
 digit       [0-9]
-id          {letter}({letter}|{digit})* 
-digits      {digit}+
-fraction    \.{digits} 
-exponent    E(\+|\-)?{digits}
-num         {digits}{fraction}?{exponent}?
+id          {letter}({letter}|{digit})*
 
 %%
 
@@ -57,8 +57,9 @@ num         {digits}{fraction}?{exponent}?
 "do"        { PRINTA(DO); }
 "not"       { PRINTA(NOT); }
 
-{num}       { PRINTA(NUM); }
-{id}        { PRINTA(ID); }
+{num}       	{ PRINTB(INUM); }
+{num}'.'{num}	{ PRINTB(RNUM); }
+{id}        	{ PRINTA(ID); }
 
 {whitespace} { ; }
 \n  { fprintf(stderr, "%s", yytext); }
