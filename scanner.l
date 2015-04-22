@@ -39,6 +39,15 @@ num					{digit}+
 "and" { PRINTB(MULOP); }
 
 ":="  { PRINTB(ASSIGNOP); }
+"("   { PRINTB(LP); }
+")"   { PRINTB(RP); }
+"["   { PRINTB(LBRKT); }
+"]"   { PRINTB(RBRKT); }
+","   { PRINTB(COMMA); }
+":"   { PRINTB(COLON); }
+";"   { PRINTB(SEMI); }
+"."   { PRINTB(DOT); }
+
 
 "program"   { PRINTA(PROGRAM); }
 "var"       { PRINTA(VAR); }

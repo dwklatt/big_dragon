@@ -82,6 +82,7 @@ scope_t *scope_pop( scope_t *top )
 		top = top->next;
 
 		//free_scope(tmp);
+    tmp = NULL;
 
 		return top;
 	}

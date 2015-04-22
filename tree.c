@@ -28,22 +28,37 @@ tree_t *make_op(int type, int attribute, tree_t *left, tree_t *right)
 
 tree_t *make_inum(int val)
 {
-	tree_t *p = make_tree(INUM, NULL, NULL);
+	//tree_t *p = make_tree(INUM, NULL, NULL);
+  tree_t *p = (tree_t *)malloc(sizeof(tree_t));
+  assert( p != NULL );
+  p->type = INUM;
 	p->attribute.ival = val;
+  p->left = NULL;
+  p->right = NULL;
 	return p;
 }
 
 tree_t *make_rnum(float val)
 {
-	tree_t *p = make_tree(RNUM, NULL, NULL);
+	//tree_t *p = make_tree(RNUM, NULL, NULL);
+  tree_t *p = (tree_t *)malloc(sizeof(tree_t));
+  assert( p != NULL );
+  p->type = RNUM;
 	p->attribute.rval = val;
+  p->left = NULL;
+  p->right = NULL;
 	return p;
 }
 
 tree_t *make_id(node_t *node)
 {
-	tree_t *p = make_tree(ID, NULL, NULL);
+	//tree_t *p = make_tree(ID, NULL, NULL);
+  tree_t *p = (tree_t *)malloc(sizeof(tree_t));
+  assert( p != NULL );
+  p->type = ID;
 	p->attribute.sval = node;
+  p->left = NULL;
+  p->right = NULL;
 	return p;
 }
 

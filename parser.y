@@ -48,6 +48,10 @@
 %token <ival> INUM
 %token <rval> RNUM
 
+%token SEMI COLON DOT
+%token LP RP
+%token LBRKT RBRKT
+
 %token LT LE GT GE EQ NE
 %token OR PLUS MINUS
 %token AND STAR SLASH
@@ -66,23 +70,23 @@
 
 program:
 	{ top_scope = scope_push(top_scope); }
-  PROGRAM ID '(' identifier_list ')' ';' declarations subprogram_declarations compound_statement '.'
+  PROGRAM ID LP identifier_list RP SEMI declarations subprogram_declarations compound_statement '.'
   { top_scope = scope_pop(top_scope); }
   ;
 
 identifier_list:
   ID { scope_insert(top_scope, $1); }
-  | identifier_list ',' ID { scope_insert(top_scope, $3); }
+  | identifier_list COMMA ID { scope_insert(top_scope, $3); }
   ;
 
 declarations:
-  declarations VAR identifier_list ':' type ';'
+  declarations VAR identifier_list COLON type SEMI
   |
   ;
 
 type:
   standard_type
-  | ARRAY '[' NUM DOTDOT NUM ']' OF standard_type
+  | ARRAY LBRKT NUM DOTDOT NUM RBRKT OF standard_type
   ;
 
 standard_type:
@@ -91,7 +95,7 @@ standard_type:
   ;
 
 subprogram_declarations:
-  subprogram_declarations subprogram_declaration ';'
+  subprogram_declarations subprogram_declaration SEMI
   |
   ;
 
@@ -102,19 +106,19 @@ subprogram_declaration:
 
 subprogram_head:
   FUNC ID { top_scope = scope_push(top_scope); }
-  arguments ':' standard_type ';'
+  arguments COLON standard_type SEMI
   | PROC ID { top_scope = scope_push(top_scope); }
-  arguments ';'
+  arguments SEMI
   ;
 
 arguments:
-  '(' parameter_list ')'
+  LP parameter_list RP
   |
   ;
 
 parameter_list:
-  identifier_list ':' type
-  | parameter_list ';' identifier_list ':' type
+  identifier_list COLON type
+  | parameter_list SEMI identifier_list COLON type
   ;
 
 compound_statement:
@@ -128,7 +132,7 @@ optional_statements:
 
 statement_list:
   statement
-  | statement_list ';' statement
+  | statement_list SEMI statement
   ;
 
 statement:
@@ -145,17 +149,19 @@ statement:
 
 variable:
   ID
-  | ID '[' expression ']'
+  | ID LBRKT expression RBRKT
   ;
 
 procedure_statement:
   ID
-  | ID '(' expression_list ')'
+  | ID LP expression_list RP
   ;
 
 expression_list:
   expression
-  | expression_list ',' expression
+  { $$ = $1; }
+  | expression_list COMMA expression
+  { $$ = make_tree(COMMA, $1, $3); }
   ;
 
 expression:
@@ -185,7 +191,7 @@ factor:
 		}
 		$$ = make_id(tmp);
 	}
-  | ID '[' expression ']'
+  | ID LBRKT expression RBRKT
   {
 		if ((tmp = scope_search_all(top_scope, $1)) == NULL) {
 			fprintf(stderr, "Name %s used but not defined\n", $1);
@@ -193,7 +199,7 @@ factor:
 		}
 		$$ = make_tree(ARRAY_ACCESS, make_id(tmp), $3);
 	}
-  | ID '(' expression_list ')'
+  | ID LP expression_list RP
 	{
 		if ((tmp = scope_search_all(top_scope, $1)) == NULL) {
 			fprintf(stderr, "Name %s used but not defined\n", $1);
@@ -203,7 +209,7 @@ factor:
 	}
 	| INUM { $$ = make_inum($1); }
 	| RNUM { $$ = make_rnum($1); }
-  | '(' expression ')' { $$ = $2; }
+  | LP expression RP { $$ = $2; }
   | NOT factor { $$ = make_tree(NOT,NULL,NULL); }
   ;
 
@@ -220,8 +226,8 @@ scope_t *top_scope;
 node_t *tmp;
 main()
 {
-	top_scope = NULL;
-	tmp = NULL;
+	//top_scope = NULL;
+	//tmp = NULL;
 	yyparse();
 }
 yyerror(char *message)
