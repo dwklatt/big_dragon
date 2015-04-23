@@ -7,6 +7,8 @@ typedef struct node_s {
 } node_t;
 
 node_t *make_node(char *name);
+void free_node(node_t *n);
+
 node_t *node_search(node_t *, char *);
 node_t *node_insert(node_t *, char *);
 #endif

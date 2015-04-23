@@ -18,6 +18,18 @@ scope_t *make_scope()
 	return p;
 }
 
+//free a scope
+void *free_scope( scope_t *p ){
+  assert( p != NULL );
+  int index;
+  for( index = 0; index < HASH_SIZE; index++ )
+  {
+    if( p->table[index] != NULL )
+      free_node( p->table[index] );
+  }
+  free( p );
+}
+
 /* local search */
 node_t *scope_search( scope_t *scope, char *name )
 {
@@ -43,7 +55,8 @@ node_t *scope_insert( scope_t *scope, char *name )
 		index = hashpjw(name);
 		head = scope->table[index];
 
-		return scope->table[index] = node_insert(head, name);
+		scope->table[index] = node_insert(head, name);
+    return scope->table[index];
 	}
 	else return NULL;
 }
@@ -75,16 +88,14 @@ scope_t *scope_push( scope_t *top )
 /* pop top scope */
 scope_t *scope_pop( scope_t *top )
 {
-	scope_t *tmp;
+	//scope_t *tmp;
 
 	if (top != NULL) {
-		tmp = top;
-		top = top->next;
+		//tmp = top;
+		//top = top->next;
 
 		//free_scope(tmp);
-    tmp = NULL;
-
-		return top;
+		return top->next;
 	}
 	else return NULL;
 }
@@ -99,7 +110,7 @@ int hashpjw( char *s )
 
 	for ( p=s; *p != EOS; p++ ) {
 		h = (h << 4) + (*p);
-		if ( g = h&0xf0000000 ) {
+	  if ( (g = (h & 0xf0000000)) != 0) {
 			h = h ^ (g >> 24);
 			h = h ^ g;
 		}
