@@ -17,6 +17,8 @@ scope_t;
 /* constructor */
 scope_t *make_scope();
 
+//clear mem
+void *free_scope(scope_t *p);
 
 /* local search and insert */
 node_t *scope_search( scope_t *head, char *name );

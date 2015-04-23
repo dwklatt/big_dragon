@@ -70,13 +70,15 @@
 
 program:
 	{ top_scope = scope_push(top_scope); }
-  PROGRAM ID LP identifier_list RP SEMI declarations subprogram_declarations compound_statement '.'
+  PROGRAM ID LP identifier_list RP SEMI declarations subprogram_declarations compound_statement DOT
   { top_scope = scope_pop(top_scope); }
   ;
 
 identifier_list:
-  ID { scope_insert(top_scope, $1); }
-  | identifier_list COMMA ID { scope_insert(top_scope, $3); }
+  ID 
+  { scope_insert(top_scope, $1); }
+  | identifier_list COMMA ID 
+  { scope_insert(top_scope, $3); }
   ;
 
 declarations:
