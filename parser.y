@@ -70,7 +70,7 @@
 
 program:
 	{ top_scope = scope_push(top_scope); }
-  PROGRAM ID LP identifier_list RP SEMI declarations subprogram_declarations compound_statement '.'
+  PROGRAM ID LP identifier_list RP SEMI declarations subprogram_declarations compound_statement DOT
   { top_scope = scope_pop(top_scope); }
   ;
 
