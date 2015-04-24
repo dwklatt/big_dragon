@@ -103,9 +103,13 @@ void print_tree(tree_t *t, int spaces)
 	fprintf(stderr, "\n");
 
 	/* go left */
-	print_tree(t->left, spaces+4);
+	if(t->left != NULL) {
+		print_tree(t->left, spaces+4);
+	}
 	/* go right */
-	print_tree(t->right, spaces+4);
+	if(t->right != NULL) {
+		print_tree(t->right, spaces+4);
+	}
 
 }
 
