@@ -16,7 +16,7 @@ parser.tab.c: parser.y
 lexer.o: lexer.c
 	gcc -g -c lexer.c
 lexer.c: scanner.l
-	flex -o  $@ $<
+	flex -ll -o  $@ $<
 
 clean:
 	rm -f dragon *.o lexer.c parser.tab.* parser.output

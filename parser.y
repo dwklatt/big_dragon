@@ -69,29 +69,68 @@
 %%
 
 program:
-	{ top_scope = scope_push(top_scope); }
+  {  
+		//hash_init( &symbol_tbl );
+    //symbol_tbl = hash_make();
+    //gen_header();
+    top_scope = scope_push(top_scope); 
+  }
   PROGRAM ID LP identifier_list RP SEMI declarations subprogram_declarations compound_statement DOT
-  { top_scope = scope_pop(top_scope); }
+  { 
+    //main_ptr = list_make($3);
+    //symbol_tbl->scope_owner = main_ptr;
+    //input_output_routines(symbol_tbl);
+    top_scope = scope_pop(top_scope);
+    //generate assembly code
+    //clean up symbol table
+  }
   ;
 
 identifier_list:
-  ID { scope_insert(top_scope, $1); }
-  | identifier_list COMMA ID { scope_insert(top_scope, $3); }
+  ID 
+  { 
+    //$$ = tree_name( ident_ptr = insert_name(symbol_tbl, $1));
+    //ident_ptr->class = NAME;
+    scope_insert(top_scope, $1); 
+  }
+  | identifier_list COMMA ID 
+  {
+    //$$ = tree_make(COMMA, $1, tree_name(ident_ptr = insert_name(symbol_tbl,$3)));
+    scope_insert(top_scope, $3); 
+  }
   ;
 
 declarations:
   declarations VAR identifier_list COLON type SEMI
+  { 
+    //assign types to names in list and mark them as LOCAL names  
+  }
   |
+  { 
+    $$=NULL; 
+  }
   ;
 
 type:
   standard_type
+  {
+    $$ = $1; 
+  }
   | ARRAY LBRKT NUM DOTDOT NUM RBRKT OF standard_type
+  {
+    //$$ = ptype_array($3,$5,$8);
+  }
   ;
 
 standard_type:
   INT
+  {
+    //$$=ptype_basic(PTYPE_INTEGER);
+  }
   | REAL
+  {
+    //$$=ptype_basic(PTYPE_REAL);
+  }
   ;
 
 subprogram_declarations:
@@ -101,7 +140,10 @@ subprogram_declarations:
 
 subprogram_declaration:
   subprogram_head declarations compound_statement
-  { top_scope = scope_pop(top_scope); }
+  { 
+    //
+    top_scope = scope_pop(top_scope); 
+  }
   ;
 
 subprogram_head:
@@ -113,7 +155,13 @@ subprogram_head:
 
 arguments:
   LP parameter_list RP
+  {
+    $$ = $2;
+  }
   |
+  {
+    $$ = NULL;
+  }
   ;
 
 parameter_list:
@@ -122,12 +170,21 @@ parameter_list:
   ;
 
 compound_statement:
-   BEGGIN optional_statements END
+  BEGGIN optional_statements END
+  {
+    $$ = $2;
+  }
   ;
 
 optional_statements:
   statement_list
+  {
+    $$ = $1;
+  }
   |
+  {
+    $$ = NULL;
+  }
   ;
 
 statement_list:
@@ -137,7 +194,8 @@ statement_list:
 
 statement:
   variable ASSIGNOP expression
-  { fprintf(stderr, "\n\nPRINTING TREE:\n");
+  { 
+		fprintf(stderr, "\n\nPRINTING TREE:\n");
 		print_tree($3,0);
 		fprintf(stderr, "\n\n");
 	}
@@ -172,6 +230,8 @@ expression:
 
 simple_expression:
   term { $$ = $1; }
+  | ADDOP term
+  { $$ = make_op( ADDOP, $1, $2, NULL); }
   | simple_expression ADDOP term
   { $$ = make_op(ADDOP, $2, $1, $3); }
   ;
@@ -210,15 +270,9 @@ factor:
 	| INUM { $$ = make_inum($1); }
 	| RNUM { $$ = make_rnum($1); }
   | LP expression RP { $$ = $2; }
-  | NOT factor { $$ = make_tree(NOT,NULL,NULL); }
+  | NOT factor { $$ = make_tree(NOT,$2,NULL); }
   ;
 
-/*
-sign:
-  '+'
-  | '-'
-  ;
-*/
 
 %%
 

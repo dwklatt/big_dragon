@@ -9,6 +9,17 @@ node_t *make_node(char *name)
 	p->name = strdup(name);
 	return p;
 }
+
+void free_node(node_t* n){
+  assert( n != NULL );
+  while( n != NULL )
+  {
+    node_t *temp = n;
+    n = n->next;
+    free( temp );
+  }
+}
+
 node_t *node_search(node_t *head, char *name)
 {
 	node_t *p = head;
