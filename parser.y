@@ -54,7 +54,7 @@
 
 %token LT LE GT GE EQ NE
 %token OR PLUS MINUS
-%token AND STAR SLASH
+%token AND STAR SLASH DIV MOD
 
 %token FUNCTION_CALL
 %token ARRAY_ACCESS

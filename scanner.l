@@ -14,6 +14,7 @@
 %}
 
 whitespace  [ \t]+
+comment 		\(\*.*\*\)
 letter      [a-zA-Z]
 digit       [0-9]
 id          {letter}({letter}|{digit})*
@@ -21,22 +22,22 @@ num					{digit}+
 
 %%
 
-"="   { PRINTB(RELOP); }
-"<"   { PRINTB(RELOP); }
-"<>"  { PRINTB(RELOP); }
-"<="  { PRINTB(RELOP); }
-">="  { PRINTB(RELOP); }
-">"   { PRINTB(RELOP); }
+"="   { yylval.opval = EQ; PRINTB(RELOP); }
+"<"   { yylval.opval = LT; PRINTB(RELOP); }
+"<>"  { yylval.opval = NE; PRINTB(RELOP); }
+"<="  { yylval.opval = LE; PRINTB(RELOP); }
+">="  { yylval.opval = GE; PRINTB(RELOP); }
+">"   { yylval.opval = GT; PRINTB(RELOP); }
 
-"+"   { PRINTB(ADDOP); }
-"-"   { PRINTB(ADDOP); }
-"or"  { PRINTB(ADDOP); }
+"+"   { yylval.opval = PLUS; PRINTB(ADDOP); }
+"-"   { yylval.opval = MINUS; PRINTB(ADDOP); }
+"or"  { yylval.opval = OR; PRINTB(ADDOP); }
 
-"*"   { PRINTB(MULOP); }
-"/"   { PRINTB(MULOP); }
-"div" { PRINTB(MULOP); }
-"mod" { PRINTB(MULOP); }
-"and" { PRINTB(MULOP); }
+"*"   { yylval.opval = STAR; PRINTB(MULOP); }
+"/"   { yylval.opval = SLASH; PRINTB(MULOP); }
+"div" { yylval.opval = DIV; PRINTB(MULOP); }
+"mod" { yylval.opval = MOD; PRINTB(MULOP); }
+"and" { yylval.opval = AND; PRINTB(MULOP); }
 
 ":="  { PRINTA(ASSIGNOP); }
 "("   { PRINTA(LP); }
@@ -67,11 +68,13 @@ num					{digit}+
 "do"        { PRINTA(DO); }
 "not"       { PRINTA(NOT); }
 
-{num}       	{ PRINTB(INUM); }
-{num}'.'{num}	{ PRINTB(RNUM); }
-{id}        	{ PRINTA(ID); }
+{num}       	{ yylval.ival = atoi(yytext); PRINTB(INUM); }
+{num}'.'{num}	{ yylval.rval = atof(yytext); PRINTB(RNUM); }
+{id}        	{ yylval.sval = strdup(yytext); PRINTB(ID); }
 
 {whitespace} { ; }
+{comment} { ; }
+
 \n  { fprintf(stderr, "%s", yytext); }
 .   { fprintf(stderr, "<%c>", yytext[0]); return yytext[0]; }
 
