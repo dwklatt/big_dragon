@@ -65,38 +65,28 @@
 %type <tval> simple_expression
 %type <tval> term
 %type <tval> factor
+%type <tval> identifier_list
 
 %%
 
 program:
   {  
-		//hash_init( &symbol_tbl );
-    //symbol_tbl = hash_make();
-    //gen_header();
     top_scope = scope_push(top_scope); 
   }
   PROGRAM ID LP identifier_list RP SEMI declarations subprogram_declarations compound_statement DOT
   { 
-    //main_ptr = list_make($3);
-    //symbol_tbl->scope_owner = main_ptr;
-    //input_output_routines(symbol_tbl);
     top_scope = scope_pop(top_scope);
-    //generate assembly code
-    //clean up symbol table
   }
   ;
 
 identifier_list:
   ID 
   { 
-    //$$ = tree_name( ident_ptr = insert_name(symbol_tbl, $1));
-    //ident_ptr->class = NAME;
-    scope_insert(top_scope, $1); 
+    $$ = make_id(scope_insert(top_scope, $1)); 
   }
   | identifier_list COMMA ID 
   {
-    //$$ = tree_make(COMMA, $1, tree_name(ident_ptr = insert_name(symbol_tbl,$3)));
-    scope_insert(top_scope, $3); 
+    $$ = make_tree(COMMA, $1, make_id(scope_insert(top_scope, $3))); 
   }
   ;
 
@@ -107,14 +97,14 @@ declarations:
   }
   |
   { 
-    $$=NULL; 
+    //$$=NULL; 
   }
   ;
 
 type:
   standard_type
   {
-    $$ = $1; 
+    //$$ = $1; 
   }
   | ARRAY LBRKT NUM DOTDOT NUM RBRKT OF standard_type
   {
@@ -156,11 +146,11 @@ subprogram_head:
 arguments:
   LP parameter_list RP
   {
-    $$ = $2;
+    //$$ = $2;
   }
   |
   {
-    $$ = NULL;
+    //$$ = NULL;
   }
   ;
 
@@ -172,18 +162,18 @@ parameter_list:
 compound_statement:
   BEGGIN optional_statements END
   {
-    $$ = $2;
+    //$$ = $2;
   }
   ;
 
 optional_statements:
   statement_list
   {
-    $$ = $1;
+    //$$ = $1;
   }
   |
   {
-    $$ = NULL;
+    //$$ = NULL;
   }
   ;
 

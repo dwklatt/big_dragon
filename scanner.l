@@ -38,15 +38,15 @@ num					{digit}+
 "mod" { PRINTB(MULOP); }
 "and" { PRINTB(MULOP); }
 
-":="  { PRINTB(ASSIGNOP); }
-"("   { PRINTB(LP); }
-")"   { PRINTB(RP); }
-"["   { PRINTB(LBRKT); }
-"]"   { PRINTB(RBRKT); }
-","   { PRINTB(COMMA); }
-":"   { PRINTB(COLON); }
-";"   { PRINTB(SEMI); }
-"."   { PRINTB(DOT); }
+":="  { PRINTA(ASSIGNOP); }
+"("   { PRINTA(LP); }
+")"   { PRINTA(RP); }
+"["   { PRINTA(LBRKT); }
+"]"   { PRINTA(RBRKT); }
+","   { PRINTA(COMMA); }
+":"   { PRINTA(COLON); }
+";"   { PRINTA(SEMI); }
+"."   { PRINTA(DOT); }
 
 
 "program"   { PRINTA(PROGRAM); }
