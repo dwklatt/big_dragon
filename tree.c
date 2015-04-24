@@ -62,7 +62,15 @@ tree_t *make_id(node_t *node)
 	return p;
 }
 
-
+void make_type(tree_t * t, int type)
+{
+	if (t->type == ID) {
+		t->attribute.sval->type = type;
+		return;
+	}
+	make_type(t->left, type);
+	make_type(t->right, type);
+}
 
 /* preorder */
 void print_tree(tree_t *t, int spaces)

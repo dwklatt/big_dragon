@@ -66,6 +66,8 @@
 %type <tval> term
 %type <tval> factor
 %type <tval> identifier_list
+%type <ival> standard_type
+%type <tval> declarations
 
 %%
 
@@ -93,18 +95,19 @@ identifier_list:
 declarations:
   declarations VAR identifier_list COLON type SEMI
   { 
-    //assign types to names in list and mark them as LOCAL names  
+    make_type($3,$5);
+    $$ = $3;  
   }
   |
   { 
-    //$$=NULL; 
+    $$=NULL; 
   }
   ;
 
 type:
   standard_type
   {
-    //$$ = $1; 
+    $$ = $1; 
   }
   | ARRAY LBRKT NUM DOTDOT NUM RBRKT OF standard_type
   {
