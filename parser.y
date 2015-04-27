@@ -68,6 +68,8 @@
 %type <tval> identifier_list
 %type <ival> standard_type
 %type <tval> declarations
+%type <tval> type
+%type <ival> NUM
 
 %%
 
@@ -111,18 +113,19 @@ type:
   }
   | ARRAY LBRKT NUM DOTDOT NUM RBRKT OF standard_type
   {
-    //$$ = ptype_array($3,$5,$8);
+    make_type(make_tree(DOTDOT,make_id(scope_insert(top_scope,$3)),make_id(scope_insert(top_scope,$5))),$8);
+		$$ = $8;
   }
   ;
 
 standard_type:
   INT
   {
-    //$$=ptype_basic(PTYPE_INTEGER);
+    $$ = INUM;
   }
   | REAL
   {
-    //$$=ptype_basic(PTYPE_REAL);
+    $$ = RNUM;
   }
   ;
 
@@ -134,7 +137,6 @@ subprogram_declarations:
 subprogram_declaration:
   subprogram_head declarations compound_statement
   { 
-    //
     top_scope = scope_pop(top_scope); 
   }
   ;
