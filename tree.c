@@ -121,4 +121,19 @@ void print_tree(tree_t *t, int spaces)
 
 }
 
+int find_type(tree_t *t){
+	if(t->type == INUM){ return INUM; }
+	else if(t->type == ID){ return t->attribute.sval->type; }
+	else if(t->type == ADDOP || t->type == MULOP) {
+		left = find_type(t->left);
+		right = find_type(t->right);
+		if(left != right) { return NULL; }
+		else { return right; }
+	}
+	else { return NULL; }
+}
 
+int semantic_check(tree_t *t) {
+	assert(t != NULL);
+
+}

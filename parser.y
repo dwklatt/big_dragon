@@ -189,7 +189,8 @@ statement_list:
 
 statement:
   variable ASSIGNOP expression
-  { 
+  {
+		assert(!semantic_check($3));
 		fprintf(stderr, "\n\nPRINTING TREE:\n");
 		print_tree($3,0);
 		fprintf(stderr, "\n\n");

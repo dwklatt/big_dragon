@@ -23,4 +23,5 @@ tree_t *make_rnum(float rval);
 
 void print_tree(tree_t *t, int spaces);
 
+int semantic_check(tree_t *t);
 #endif
