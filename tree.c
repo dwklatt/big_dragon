@@ -104,6 +104,9 @@ void print_tree(tree_t *t, int spaces)
 	case RELOP:
 		fprintf(stderr, "[RELOP:%d]", t->attribute.opval);
 		break;
+	case ASSIGNOP:
+		fprintf(stderr, "[ASSIGNOP:%d]", t->attribute.opval);
+		break;
 	default:
 		fprintf(stderr, "[UNKNOWN]");
 		break;
@@ -122,18 +125,62 @@ void print_tree(tree_t *t, int spaces)
 }
 
 int find_type(tree_t *t){
+	int left,right;
+	if( t == NULL) { return 0; }
 	if(t->type == INUM){ return INUM; }
+	else if(t->type == RNUM){ return RNUM; }
 	else if(t->type == ID){ return t->attribute.sval->type; }
 	else if(t->type == ADDOP || t->type == MULOP) {
 		left = find_type(t->left);
 		right = find_type(t->right);
-		if(left != right) { return NULL; }
+		if(left != right) { return 0; }
 		else { return right; }
 	}
-	else { return NULL; }
+	else { return 0; }
 }
 
 int semantic_check(tree_t *t) {
 	assert(t != NULL);
+	fprintf(stderr,"type is %s\n",t->type);
+	int left, right;
+	left = find_type(t->left);
+	right = find_type(t->right);
+	switch(t->type) {
+		case ADDOP:
+			if(!left || !right){ 
+				fprintf(stderr, "incomplete statement?\n"); 
+				return -1; 
+			}
+			if(left != right) {
+				fprintf(stderr, "you can't add a %s to a %s you sick fuck.\n", left, right); 
+				return -1; 
+			}
+			return 0;
+		case MULOP:
+			if(!left || !right){ 
+				fprintf(stderr, "incomplete statement?\n"); 
+				return -1; 
+			}
+			return 0;
+		case ASSIGNOP:
+			if(!left || !right){ 
+				fprintf(stderr, "incomplete statement?\n"); 
+				return -1; 
+			}
+			if(left != right) {
+				fprintf(stderr, "this isn't python asshole, a %d cannot have a value of %d\n", left, right);
+				return -1;
+			}
+			return 0;
+		case INUM:
+			return 0;
+		case RNUM:
+			return 0;
+		case ID:
+			return 0;
+		default:
+			fprintf(stderr, "Unknown operation, bailing... [%d]\n",t->type); 
+			return -1;
+	}
 
 }

@@ -42,7 +42,7 @@
 %token <opval> RELOP
 %token <opval> ADDOP
 %token <opval> MULOP
-%token ASSIGNOP
+%token <opval> ASSIGNOP
 %token NOT
 
 %token <ival> INUM
@@ -70,6 +70,7 @@
 %type <tval> declarations
 %type <tval> type
 %type <ival> NUM
+%type <tval> variable
 
 %%
 
@@ -190,10 +191,17 @@ statement_list:
 statement:
   variable ASSIGNOP expression
   {
-		assert(!semantic_check($3));
-		fprintf(stderr, "\n\nPRINTING TREE:\n");
-		print_tree($3,0);
-		fprintf(stderr, "\n\n");
+		//assert(!semantic_check($3));
+		//this is broken
+		tree_t * t;
+		fprintf(stderr,"about to make_id\n");
+		t = make_op(ASSIGNOP, $2, $1, $3);
+		fprintf(stderr, "t is %s\n", t->type);
+		print_tree(t,0);
+		assert(!semantic_check(t));
+		//fprintf(stderr, "\n\nPRINTING TREE:\n");
+		//print_tree($3,0);
+		//fprintf(stderr, "\n\n");
 	}
   | procedure_statement
   | compound_statement
@@ -203,7 +211,19 @@ statement:
 
 variable:
   ID
-  | ID LBRKT expression RBRKT
+	{
+		//this might need to be fixed?
+		if ((tmp = scope_search_all(top_scope, $1)) == NULL) {
+			fprintf(stderr, "Name %s used but not defined\n", $1);
+			exit(1);
+		}
+
+		$$ = make_id(tmp);
+	}
+  | 
+	{ 
+		//ID LBRKT expression RBRKT 
+	}
   ;
 
 procedure_statement:

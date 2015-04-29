@@ -18,7 +18,8 @@ comment 		\(\*.*\*\)
 letter      [a-zA-Z]
 digit       [0-9]
 id          {letter}({letter}|{digit})*
-num					{digit}+
+int					{digit}+
+real				{int}\.{int}
 
 %%
 
@@ -39,7 +40,7 @@ num					{digit}+
 "mod" { yylval.opval = MOD; PRINTB(MULOP); }
 "and" { yylval.opval = AND; PRINTB(MULOP); }
 
-":="  { PRINTA(ASSIGNOP); }
+":="  { yylval.opval = ASSIGNOP; PRINTA(ASSIGNOP); }
 "("   { PRINTA(LP); }
 ")"   { PRINTA(RP); }
 "["   { PRINTA(LBRKT); }
@@ -47,8 +48,7 @@ num					{digit}+
 ","   { PRINTA(COMMA); }
 ":"   { PRINTA(COLON); }
 ";"   { PRINTA(SEMI); }
-"."   { PRINTA(DOT); }
-
+"."		{ PRINTA(DOT); }
 
 "program"   { PRINTA(PROGRAM); }
 "var"       { PRINTA(VAR); }
@@ -68,8 +68,8 @@ num					{digit}+
 "do"        { PRINTA(DO); }
 "not"       { PRINTA(NOT); }
 
-{num}       	{ yylval.ival = atoi(yytext); PRINTB(INUM); }
-{num}'.'{num}	{ yylval.rval = atof(yytext); PRINTB(RNUM); }
+{int}       	{ yylval.ival = atoi(yytext); PRINTB(INUM); }
+{real}				{ yylval.rval = atof(yytext); PRINTB(RNUM); }
 {id}        	{ yylval.sval = strdup(yytext); PRINTB(ID); }
 
 {whitespace} { ; }
