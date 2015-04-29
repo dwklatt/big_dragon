@@ -10,6 +10,7 @@
   
   extern scope_t *top_scope;
 	extern node_t *tmp;
+	extern tree_t *t;
   
 %}
 
@@ -56,7 +57,7 @@
 %token OR PLUS MINUS
 %token AND STAR SLASH DIV MOD
 
-%token FUNCTION_CALL
+%token FUNCTION_CALL PROCEDURE_CALL
 %token ARRAY_ACCESS
 %token COMMA
 
@@ -71,6 +72,7 @@
 %type <tval> type
 %type <ival> NUM
 %type <tval> variable
+%type <tval> parameter_list
 
 %%
 
@@ -87,10 +89,18 @@ program:
 identifier_list:
   ID 
   { 
+  	if ((tmp = scope_search(top_scope, $1)) != NULL) {
+			fprintf(stderr, "Name %s already used\n", $1);
+			exit(1);
+		}
     $$ = make_id(scope_insert(top_scope, $1)); 
   }
   | identifier_list COMMA ID 
   {
+  	if ((tmp = scope_search(top_scope, $3)) != NULL) {
+			fprintf(stderr, "Syntax error, name %s already used\n", $3);
+			exit(1);
+		}
     $$ = make_tree(COMMA, $1, make_id(scope_insert(top_scope, $3))); 
   }
   ;
@@ -136,16 +146,36 @@ subprogram_declarations:
   ;
 
 subprogram_declaration:
-  subprogram_head declarations compound_statement
+  subprogram_head declarations subprogram_declarations compound_statement
   { 
-    top_scope = scope_pop(top_scope); 
+    top_scope = scope_pop(top_scope);
   }
   ;
 
 subprogram_head:
-  FUNC ID { top_scope = scope_push(top_scope); }
+  FUNC ID 
+  {
+  	if ((tmp = scope_search(top_scope, $2)) != NULL) {
+			fprintf(stderr, "Syntax error, %s name %s already used\n",tmp->name, $2);
+			exit(1);
+		}
+		else { 
+  		scope_insert(top_scope, $2); 
+  		top_scope = scope_push(top_scope);
+  	} 
+  }
   arguments COLON standard_type SEMI
-  | PROC ID { top_scope = scope_push(top_scope); }
+  | PROC ID
+  {
+  	if ((tmp = scope_search(top_scope, $2)) != NULL) {
+			fprintf(stderr, "Syntax error, %s name %s already used\n",tmp->type,$2);
+			exit(1);
+		}
+		else {
+  		scope_insert(top_scope, $2);
+  		top_scope = scope_push(top_scope);
+  	}
+  }
   arguments SEMI
   ;
 
@@ -162,7 +192,9 @@ arguments:
 
 parameter_list:
   identifier_list COLON type
+  {$$ = make_type($1,$3);}
   | parameter_list SEMI identifier_list COLON type
+  {make_type($3,$5); $$ = $1;}
   ;
 
 compound_statement:
@@ -191,14 +223,17 @@ statement_list:
 statement:
   variable ASSIGNOP expression
   {
-		//assert(!semantic_check($3));
-		//this is broken
-		tree_t * t;
-		fprintf(stderr,"about to make_id\n");
-		t = make_op(ASSIGNOP, $2, $1, $3);
-		fprintf(stderr, "t is %s\n", t->type);
+  	fprintf(stderr,"checking expression\n");
+  	print_tree($3,0);
+		assert(!semantic_check($3));
+		fprintf(stderr,"checked expression\n");
+		tree_t *t;
+		int check;
+		t = make_op(ASSIGNOP,$2, $1, $3);
 		print_tree(t,0);
-		assert(!semantic_check(t));
+		check = semantic_check(t);
+		fprintf(stderr,"check = %d\n",check);
+		assert(!check);
 		//fprintf(stderr, "\n\nPRINTING TREE:\n");
 		//print_tree($3,0);
 		//fprintf(stderr, "\n\n");
@@ -212,12 +247,10 @@ statement:
 variable:
   ID
 	{
-		//this might need to be fixed?
 		if ((tmp = scope_search_all(top_scope, $1)) == NULL) {
 			fprintf(stderr, "Name %s used but not defined\n", $1);
 			exit(1);
 		}
-
 		$$ = make_id(tmp);
 	}
   | 
@@ -228,7 +261,13 @@ variable:
 
 procedure_statement:
   ID
+  {
+  	//make_id(scope_insert(top_scope,$1));
+  }
   | ID LP expression_list RP
+  {
+  	//make_tree(PROCEDURE_CALL, make_id(scope_insert(top_scope, $1)), $3);
+  }
   ;
 
 expression_list:
@@ -296,7 +335,7 @@ scope_t *top_scope;
 node_t *tmp;
 main()
 {
-	//top_scope = NULL;
+	//top_scope = make_scope();
 	//tmp = NULL;
 	yyparse();
 }

@@ -40,7 +40,7 @@ real				{int}\.{int}
 "mod" { yylval.opval = MOD; PRINTB(MULOP); }
 "and" { yylval.opval = AND; PRINTB(MULOP); }
 
-":="  { yylval.opval = ASSIGNOP; PRINTA(ASSIGNOP); }
+":="  { yylval.opval = ASSIGNOP; PRINTB(ASSIGNOP); }
 "("   { PRINTA(LP); }
 ")"   { PRINTA(RP); }
 "["   { PRINTA(LBRKT); }

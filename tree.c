@@ -140,11 +140,14 @@ int find_type(tree_t *t){
 }
 
 int semantic_check(tree_t *t) {
+	fprintf(stderr,"starting check\n");
 	assert(t != NULL);
-	fprintf(stderr,"type is %s\n",t->type);
 	int left, right;
+	fprintf(stderr,"checking left\n");
 	left = find_type(t->left);
+	fprintf(stderr,"checking right\n");
 	right = find_type(t->right);
+	fprintf(stderr,"starting switch %s\n",t->type);
 	switch(t->type) {
 		case ADDOP:
 			if(!left || !right){ 
@@ -168,7 +171,7 @@ int semantic_check(tree_t *t) {
 				return -1; 
 			}
 			if(left != right) {
-				fprintf(stderr, "this isn't python asshole, a %d cannot have a value of %d\n", left, right);
+				fprintf(stderr, "this isn't python asshole, a %s cannot have a value of %s\n", left, right);
 				return -1;
 			}
 			return 0;

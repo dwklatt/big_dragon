@@ -14,7 +14,6 @@ scope_t *make_scope()
 		p->table[i] = NULL;
 	}
 	p->next = NULL;
-
 	return p;
 }
 
@@ -80,7 +79,6 @@ scope_t *scope_push( scope_t *top )
 {
 	scope_t *new_scope = make_scope();
 	assert( new_scope != NULL );
-
 	new_scope->next = top;
 	return new_scope;
 }
