@@ -152,15 +152,23 @@ subprogram_declaration:
   { 
     top_scope = scope_pop(top_scope);
   }
-  |
-  function_head declarations subprogram_declarations compound_statement RTURN standard_type
-  { 
-    top_scope = scope_pop(top_scope);
-  }
   ;
 
 subprogram_head:
- 	PROC ID
+ 	FUNC ID 
+  {
+  	if ((tmp = scope_search(top_scope, $2)) != NULL) {
+			fprintf(stderr, "Syntax error, %s name %s already used\n",tmp->name, $2);
+			exit(1);
+		}
+		else { 
+  		scope_insert(top_scope, $2); 
+  		top_scope = scope_push(top_scope);
+  	} 
+  }
+  arguments COLON standard_type SEMI
+  |
+	PROC ID
   {
   	if ((tmp = scope_search(top_scope, $2)) != NULL) {
 			fprintf(stderr, "Syntax error, %s name %s already used\n",tmp->type,$2);
@@ -174,21 +182,6 @@ subprogram_head:
   arguments SEMI
   ;
   
-function_head:
-FUNC ID 
-  {
-  	if ((tmp = scope_search(top_scope, $2)) != NULL) {
-			fprintf(stderr, "Syntax error, %s name %s already used\n",tmp->name, $2);
-			exit(1);
-		}
-		else { 
-  		scope_insert(top_scope, $2); 
-  		top_scope = scope_push(top_scope);
-  	} 
-  }
-  arguments COLON standard_type SEMI
-  ;
-
 arguments:
   LP parameter_list RP
   {
