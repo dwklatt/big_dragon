@@ -38,7 +38,7 @@
 %token IF
 %token THEN
 %token ELSE
-%token WHILE
+%token <opval> WHILE
 %token DO
 %token <opval> RELOP
 %token <opval> ADDOP
@@ -223,16 +223,13 @@ statement_list:
 statement:
   variable ASSIGNOP expression
   {
-  	fprintf(stderr,"checking expression\n");
-  	print_tree($3,0);
 		assert(!semantic_check($3));
-		fprintf(stderr,"checked expression\n");
 		tree_t *t;
 		int check;
 		t = make_op(ASSIGNOP,$2, $1, $3);
-		print_tree(t,0);
+		//print_tree(t,0);
 		check = semantic_check(t);
-		fprintf(stderr,"check = %d\n",check);
+		//fprintf(stderr,"check = %d\n",check);
 		assert(!check);
 		//fprintf(stderr, "\n\nPRINTING TREE:\n");
 		//print_tree($3,0);
@@ -242,6 +239,15 @@ statement:
   | compound_statement
   | IF expression THEN statement ELSE statement
   | WHILE expression DO statement
+  {
+  	tree_t *t;
+		int check;
+		t = make_op(RELOP,$1, $2, NULL);
+		//print_tree(t,0);
+		check = semantic_check(t);
+		//fprintf(stderr,"check = %d\n",check);
+		assert(!check);
+  }
   ;
 
 variable:

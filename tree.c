@@ -130,24 +130,21 @@ int find_type(tree_t *t){
 	if(t->type == INUM){ return INUM; }
 	else if(t->type == RNUM){ return RNUM; }
 	else if(t->type == ID){ return t->attribute.sval->type; }
+	else if(t->type == RELOP){ return RELOP; }
 	else if(t->type == ADDOP || t->type == MULOP) {
 		left = find_type(t->left);
 		right = find_type(t->right);
 		if(left != right) { return 0; }
-		else { return right; }
+		else { return left; }
 	}
 	else { return 0; }
 }
 
 int semantic_check(tree_t *t) {
-	fprintf(stderr,"starting check\n");
 	assert(t != NULL);
 	int left, right;
-	fprintf(stderr,"checking left\n");
 	left = find_type(t->left);
-	fprintf(stderr,"checking right\n");
 	right = find_type(t->right);
-	fprintf(stderr,"starting switch %s\n",t->type);
 	switch(t->type) {
 		case ADDOP:
 			if(!left || !right){ 
@@ -155,7 +152,7 @@ int semantic_check(tree_t *t) {
 				return -1; 
 			}
 			if(left != right) {
-				fprintf(stderr, "you can't add a %s to a %s you sick fuck.\n", left, right); 
+				fprintf(stderr, "you can't add a %d to a %d", left, right);
 				return -1; 
 			}
 			return 0;
@@ -171,9 +168,16 @@ int semantic_check(tree_t *t) {
 				return -1; 
 			}
 			if(left != right) {
-				fprintf(stderr, "this isn't python asshole, a %s cannot have a value of %s\n", left, right);
+				fprintf(stderr, "this isn't python, a %s cannot have a value of %s\n", left, right);
 				return -1;
 			}
+			return 0;
+		case RELOP:
+			if(left != 276) {
+				fprintf(stderr, "not a boolean statement\n");
+				return -1;
+			}
+			//fprintf(stderr,"made it to RELOP, %d %d\n", left, t->left->attribute.opval);
 			return 0;
 		case INUM:
 			return 0;
