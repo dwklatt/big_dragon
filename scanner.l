@@ -67,6 +67,7 @@ real				{int}\.{int}
 "while"     { PRINTA(WHILE); }
 "do"        { PRINTA(DO); }
 "not"       { PRINTA(NOT); }
+"return"    { PRINTA(RTURN); }
 
 {int}       	{ yylval.ival = atoi(yytext); PRINTB(INUM); }
 {real}				{ yylval.rval = atof(yytext); PRINTB(RNUM); }
