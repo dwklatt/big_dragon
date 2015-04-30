@@ -48,12 +48,12 @@ real				{int}\.{int}
 ","   { PRINTA(COMMA); }
 ":"   { PRINTA(COLON); }
 ";"   { PRINTA(SEMI); }
-"."		{ PRINTA(DOT); }
 
 "program"   { PRINTA(PROGRAM); }
 "var"       { PRINTA(VAR); }
 "array"     { PRINTA(ARRAY); }
 ".."        { PRINTA(DOTDOT); }
+"."		{ PRINTA(DOT); }
 "of"        { PRINTA(OF); }
 "integer"   { PRINTA(INT); }
 "real"      { PRINTA(REAL); }

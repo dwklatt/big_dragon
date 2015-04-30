@@ -124,7 +124,7 @@ type:
   {
     $$ = $1; 
   }
-  | ARRAY LBRKT NUM DOTDOT NUM RBRKT OF standard_type
+  | ARRAY LBRKT INUM DOTDOT INUM RBRKT OF standard_type
   {
     make_type(make_tree(DOTDOT,make_id(scope_insert(top_scope,$3)),make_id(scope_insert(top_scope,$5))),$8);
 		$$ = $8;
